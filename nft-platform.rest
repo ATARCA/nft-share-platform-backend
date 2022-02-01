@@ -1,0 +1,12 @@
+GET http://localhost:3003/ping HTTP/1.1
+###
+POST http://localhost:3003/multiply HTTP/1.1
+content-type: application/json
+
+{
+    "value1": "2",
+    "value2": "3"
+}
+###
+GET http://localhost:3003/undefinedRoute HTTP/1.1
+###

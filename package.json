@@ -1,0 +1,37 @@
+{
+  "name": "nft-share-platform-backend",
+  "version": "0.0.1",
+  "description": "NFT sharing platform backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node build/index.js",
+    "dev": "ts-node-dev index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .ts .",
+    "tsc": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ATARCA/nft-share-platform-backend.git"
+  },
+  "author": "ATARCA",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ATARCA/nft-share-platform-backend/issues"
+  },
+  "homepage": "https://github.com/ATARCA/nft-share-platform-backend#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.13",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.8.0",
+    "ts-node": "^10.4.0",
+    "ts-node-dev": "^1.1.8",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.5"
+  }
+}
