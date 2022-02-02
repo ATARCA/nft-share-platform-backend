@@ -1,4 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
+import morgan from 'morgan';
+
+morgan.token('body', function (req: Request, _res) { return JSON.stringify(req.body); });
+export const requestLogger = morgan(':method :url :status :res[content-length] - :response-time ms :body');
 
 export const unknownEndpoint = (request: Request, response: Response) => {
     console.error('Unknown endpoint ',request.originalUrl);

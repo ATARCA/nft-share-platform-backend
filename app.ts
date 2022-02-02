@@ -1,10 +1,11 @@
 import express from 'express';
 import demoRouter from './routes/demoRouter';
-import { unknownEndpoint, errorHandler } from './utils/middleware';
+import { unknownEndpoint, errorHandler, requestLogger } from './utils/middleware';
 
 const app = express();
 app.use(express.json());
 
+app.use(requestLogger);
 
 app.use(demoRouter);
 
