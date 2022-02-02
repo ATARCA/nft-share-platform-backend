@@ -1,4 +1,6 @@
 import  express  from 'express';
+import { MultiplyPayloadDemo } from '../types';
+import * as demoService from '../services/demoService';
 
 const router = express.Router();
 
@@ -6,12 +8,10 @@ router.get('/ping', (_req, res) => {
     res.send('pong');
 });
 
-  type MultiplyPayload = {value1: number, value2: number};
-
 router.post('/multiply', (req, res) => {
-    console.log('body:',req.body);
-    const payload = req.body as MultiplyPayload;
-    res.send({ result: payload.value1 * payload.value2 });
+    const payload = req.body as MultiplyPayloadDemo;
+    const result = demoService.multiply(payload);
+    res.status(200).send({ result: result });
 });
 
 export default router;
