@@ -1,19 +1,10 @@
-import express from 'express';
-import demoRouter from './routes/demoRouter';
-import { unknownEndpoint, errorHandler } from './utils/middleware';
+import * as http from 'http';
+import app from './app';
 
-const app = express();
-app.use(express.json());
-
-
-app.use(demoRouter);
-
-app.use(unknownEndpoint);
-app.use(errorHandler);
+const server = http.createServer(app);
 
 const PORT = 3003;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
