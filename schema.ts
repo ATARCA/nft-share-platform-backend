@@ -3,11 +3,12 @@ import { TypeSource } from '@graphql-tools/utils';
 
 export const schemaDefs: TypeSource = gql`
   type Book {
-    title: String
-    author: String
+    title: String!
+    author: String!
   }
 
   type Query {
-    allBooks: [Book]
+    allBooks: [Book!]!
+    multiply(value1: Int!, value2: Int!): Int!
   }
 `;
