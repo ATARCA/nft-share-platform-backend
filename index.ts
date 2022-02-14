@@ -1,7 +1,6 @@
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { gql } from 'apollo-server';
 import { schemaDefs } from './schema';
 import { resolvers } from './resolvers';
 import http from 'http';
@@ -17,13 +16,12 @@ async function startApolloServer(schema: GraphQLSchema) {
     const server = new ApolloServer({
         schema: schema,
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer }),
-            ApolloServerPluginLandingPageGraphQLPlayground],
+            ApolloServerPluginLandingPageGraphQLPlayground]
     });
 
     await server.start();
     server.applyMiddleware({
         app,
-        // graphql path.
         path: '/graphql'
     });
 

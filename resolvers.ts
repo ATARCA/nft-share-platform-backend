@@ -14,7 +14,8 @@ export const resolvers = {
         multiply(_root: any, args: any) {
             const payload: MultiplyPayloadDemo = { value1: args.value1 as number, value2: args.value2 as number };
             const result = multiply(payload);
-            return result;
+            const resultObject = { value: result };
+            return resultObject;
         }
     }
 };

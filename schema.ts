@@ -7,8 +7,12 @@ export const schemaDefs: TypeSource = gql`
     author: String!
   }
 
+  type MultiplyResult {
+    value: Int!
+  }
+
   type Query {
     allBooks: [Book!]!
-    multiply(value1: Int!, value2: Int!): Int!
+    multiply(value1: Int!, value2: Int!): MultiplyResult!
   }
 `;
