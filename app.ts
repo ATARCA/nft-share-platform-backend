@@ -5,11 +5,13 @@ import { unknownEndpoint, errorHandler, requestLogger } from './utils/middleware
 const app = express();
 app.use(express.json());
 
-app.use(requestLogger);
+app.use('/api',requestLogger);
 
 app.use(demoRouter);
 
-app.use(unknownEndpoint);
-app.use(errorHandler);
+export const initAppMiddleware = () => {
+    app.use('/api',unknownEndpoint);
+    app.use('/api',errorHandler);
+};
 
 export default app;
