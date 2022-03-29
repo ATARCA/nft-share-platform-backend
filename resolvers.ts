@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { multiply } from './services/demoService';
+import { getMetadataUploadMessageToSign } from './services/metadataService';
 import { MultiplyPayloadDemo } from './types';
 
 export const resolvers = {
@@ -16,6 +17,12 @@ export const resolvers = {
             const result = multiply(payload);
             const resultObject = { value: result };
             return resultObject;
+        },
+        getMetadataUploadMessageToSign(_root: any, args: any) {
+            const txHash = args.txHash as string;
+            const metadata = args.metadata as string;
+            const messageToSign = getMetadataUploadMessageToSign(txHash, metadata);
+            return messageToSign;
         }
     }
 };

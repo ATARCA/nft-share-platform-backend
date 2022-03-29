@@ -14,5 +14,6 @@ export const schemaDefs: TypeSource = gql`
   type Query {
     allBooks: [Book!]!
     multiply(value1: Int!, value2: Int!): MultiplyResult!
+    getMetadataUploadMessageToSign(txHash: String!, metadata: String!): String!
   }
 `;
