@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { multiply } from './services/demoService';
-import { getMetadataUploadMessageToSign } from './services/metadataService';
+import { getMetadataUploadMessageToSign, verifyMetadataSignature } from './services/metadataService';
 import { MultiplyPayloadDemo } from './types';
 
 export const resolvers = {
@@ -23,6 +23,26 @@ export const resolvers = {
             const metadata = args.metadata as string;
             const messageToSign = getMetadataUploadMessageToSign(txHash, metadata);
             return messageToSign;
+        }
+    },
+    Mutation: {
+        addPendingMetadata(_root: any, args: any) {
+            const txHash = args.txHash as string;
+            const metadata = args.metadata as string;
+            const signingAddress = args.signingAddress as string;
+            const signature = args.signature as string;
+
+            const signatureValid = verifyMetadataSignature(txHash, metadata, signingAddress, signature);
+
+            if (signatureValid) {
+
+                const result = { success: true };
+                return result;
+            }
+            else {
+                const result = { success: true, message: 'Signature validation failed' };
+                return result;
+            }
         }
     }
 };
