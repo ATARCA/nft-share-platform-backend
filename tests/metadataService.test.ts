@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import 'jest';
 import { verifyMetadataSignature } from '../services/metadataService';
 
