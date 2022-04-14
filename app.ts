@@ -55,5 +55,20 @@ export const initAppMiddleware = () => {
     app.use('/api',unknownEndpoint);
     app.use('/api',errorHandler);
 };
+const updatePeriodMinutes = 2;
+const updateTokenMetadataPeriodMS = 1000 * 60 * updatePeriodMinutes ;
+
+const setPeriodicTaskForTokenMetadataUpdate = () => {
+    setInterval( () => {
+        (async () => {
+            await checkLatestEventsAndPostMetadata();
+        })().catch( (error) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            console.error( 'setPeriodicTaskForTokenEventsCheck failed', error);
+        });
+    },updateTokenMetadataPeriodMS);
+};
+
+setPeriodicTaskForTokenMetadataUpdate();
 
 export default app;
