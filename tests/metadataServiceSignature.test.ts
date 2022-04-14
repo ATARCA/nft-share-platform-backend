@@ -1,7 +1,18 @@
 import 'jest';
-import { verifyMetadataSignature } from '../services/metadataService';
+import { initMongoose, shutdownMongoose } from '../app';
+import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
+import { StoredMetadataModel } from '../models/StoredMetadataModel';
+import { StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
+import { checkLatestEventsAndPostMetadata, verifyMetadataSignature } from '../services/metadataService';
+import { initWeb3Provider, web3provider } from '../web3/web3provider';
 
 describe('metadataService signature test', () => {
+
+    afterAll( async () => {
+        await web3provider.destroy();
+        await shutdownMongoose();
+    });
+
     it('validate correct signature', () => {
         const metadata = 'This is metadata';
         const txHash = 'txHashIsThis';

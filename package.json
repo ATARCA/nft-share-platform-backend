@@ -10,7 +10,8 @@
     "lint": "eslint --ext .ts .",
     "tsc": "tsc",
     "contracts:clean": "rimraf src/typechain-types && rimraf src/abi-generated",
-    "contracts:update": "npm run contracts:clean && cd ../nft-share-platform-contracts && npm run build && copyfiles \"./typechain-types/**\" \"../nft-share-platform-backend\" && copyfiles \"./abi-generated/**\" \"../nft-share-platform-backend\""
+    "contracts:removehardhatdependency": "rimraf typechain-types/hardhat.d.ts",
+    "contracts:update": "npm run contracts:clean && cd ../nft-share-platform-contracts && npm run build && copyfiles \"./typechain-types/**\" \"../nft-share-platform-backend\" && copyfiles \"./abi-generated/**\" \"../nft-share-platform-backend\" && cd ../nft-share-platform-backend && npm run contracts:removehardhatdependency"
   },
   "repository": {
     "type": "git",
