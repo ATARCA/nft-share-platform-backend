@@ -9,8 +9,8 @@ describe('StoredMetadataModel test', () => {
     });
 
     afterAll(async () => {
-        await shutdownMongoose();
         await web3provider.destroy();
+        await shutdownMongoose();
     });
 
     beforeEach(async () => {

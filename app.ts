@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import demoRouter from './routes/demoRouter';
+import metadataRouter from './routes/metadataRouter';
 import { checkLatestEventsAndPostMetadata } from './services/metadataService';
 import { unknownEndpoint, errorHandler, requestLogger } from './utils/middleware';
 
@@ -44,12 +44,12 @@ if (!isJestTest()) {
         });
 }
 
-const app = express();
+export const app = express();
 app.use(express.json());
 
 app.use('/api',requestLogger);
 
-app.use(demoRouter);
+app.use(metadataRouter);
 
 export const initAppMiddleware = () => {
     app.use('/api',unknownEndpoint);
@@ -69,6 +69,6 @@ const setPeriodicTaskForTokenMetadataUpdate = () => {
     },updateTokenMetadataPeriodMS);
 };
 
-setPeriodicTaskForTokenMetadataUpdate();
-
-export default app;
+if (!isJestTest()) {
+    setPeriodicTaskForTokenMetadataUpdate();
+}

@@ -7,7 +7,7 @@ import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQL
 import { schemaDefs } from './schema';
 import { resolvers } from './resolvers';
 import http from 'http';
-import app from './app';
+import { app } from './app';
 import { initAppMiddleware } from './app';
 import { GraphQLSchema } from 'graphql';
 
