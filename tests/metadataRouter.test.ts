@@ -9,13 +9,10 @@ const api = supertest(app);
 describe('metadata router', () => {
 
 
-    /*   beforeEach(() => {
+    beforeEach( async () => {
+        await StoredMetadataModel.deleteMany({});
 
     });
-
-    afterEach(() => {
-
-    });*/
 
     beforeAll( async () => {
         await initMongoose();
@@ -27,7 +24,6 @@ describe('metadata router', () => {
     });
 
     it('can return stored metadata', async () => {
-        await StoredMetadataModel.deleteMany({});
 
         const metadata = {
             name: 'token name',
@@ -38,8 +34,19 @@ describe('metadata router', () => {
         const response = await api.get('/metadata/0x00AA/22')
             .expect(StatusCodes.OK);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        //const body = response.body;
         expect(response.body).toMatchObject(metadata);
+    });
+
+    it('returns 400 for non-existing metadata', async () => {
+
+        const metadata = {
+            name: 'token name',
+            description: 'token description'
+        };
+
+        await new StoredMetadataModel({ contractAddress: '0x00AA', tokenId: '01', metadata: JSON.stringify(metadata) }).save();
+
+        await api.get('/metadata/0x00AA/22').expect(StatusCodes.BAD_REQUEST);
+
     });
 });
