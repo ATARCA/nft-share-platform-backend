@@ -11,6 +11,7 @@ metadataRouter.get('/metadata/:contractAddress/:tokenId', async (req, res) => {
     try {
         const result = await StoredMetadataModel.findOne({ contractAddress, tokenId });
         if (result) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const metadataObject = JSON.parse(result.metadata);
             res.send(metadataObject);
         }
