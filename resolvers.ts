@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { StoredPendingMetadata, StoredPendingMetadataModel } from './models/StoredPendingMetadataModel';
 import { multiply } from './services/demoService';
 import { getMetadataUploadMessageToSign, verifyMetadataSignature } from './services/metadataService';
 import { MultiplyPayloadDemo } from './types';
@@ -26,21 +27,28 @@ export const resolvers = {
         }
     },
     Mutation: {
-        addPendingMetadata(_root: any, args: any) {
-            const txHash = args.txHash as string;
+        async addPendingMetadata(_root: any, args: any) {
+            const pendingTxHash = args.pendingTxHash as string;
             const metadata = args.metadata as string;
             const signingAddress = args.signingAddress as string;
             const signature = args.signature as string;
 
-            const signatureValid = verifyMetadataSignature(txHash, metadata, signingAddress, signature);
+            const existingRecord = await StoredPendingMetadataModel.findOne({ pendingTxHash });
+            if (existingRecord) {
+                const result = { success: false, message: `Pending metadata for txHash ${pendingTxHash} already exist` };
+                return result;
+            }
+
+            const signatureValid = verifyMetadataSignature(pendingTxHash, metadata, signingAddress, signature);
 
             if (signatureValid) {
-
+                const metadataRecord: StoredPendingMetadata = { metadata, pendingTxHash };
+                await new StoredPendingMetadataModel(metadataRecord).save();
                 const result = { success: true };
                 return result;
             }
             else {
-                const result = { success: true, message: 'Signature validation failed' };
+                const result = { success: false, message: 'Signature validation failed' };
                 return result;
             }
         }

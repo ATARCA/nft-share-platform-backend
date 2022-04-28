@@ -12,7 +12,7 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
         const isSignerMatching = !!(recoveredAddress === signingAddress.toLowerCase());
         return isSignerMatching;
     } catch (error) {
-        console.error(`verifyMetadataSignature error for signature ${signature} and signed message ${signedMessage}`,error);
+        console.warn(`verifyMetadataSignature error for signature ${signature} and signed message ${signedMessage}`,error);
         return false;
     }
 };
