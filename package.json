@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "ts-node-dev index.ts",
-    "test": "rimraf ./build && cross-env NODE_ENV=test jest --runInBand  --verbose",
+    "test": "rimraf ./build && cross-env NODE_ENV=test jest --runInBand  --verbose --forceExit",
     "lint": "eslint --ext .ts .",
     "tsc": "tsc",
     "contracts:clean": "rimraf src/typechain-types && rimraf src/abi-generated",
