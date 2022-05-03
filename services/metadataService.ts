@@ -51,8 +51,9 @@ const processEventsForNewlyMintedTokens = async (events: TransferEvent[]) => {
         if (pendingMetadata) {
             const tokenId = event.args.tokenId.toBigInt().toString();
             const contractAddress = event.address;
-            console.log('storing metadata', { metadata: pendingMetadata.metadata, tokenId, contractAddress });
-            await new StoredMetadataModel({ metadata: pendingMetadata.metadata, tokenId, contractAddress } ).save();
+            const originalTokenHolder = event.args.to;
+            console.log('storing metadata', { metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder });
+            await new StoredMetadataModel({ metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder } ).save();
         }
     });
 

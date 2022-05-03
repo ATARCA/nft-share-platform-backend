@@ -39,7 +39,8 @@ describe('metadata update on share event', () => {
         expect(allStoredMetada[0]).toMatchObject({
             metadata: 'this is metadata',
             tokenId: '1',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: '0xA86cb4378Cdbc327eF950789c81BcBcc3aa73D21'
         });
     });
 

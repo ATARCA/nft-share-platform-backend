@@ -3,7 +3,8 @@ import mongoose, { Document as MongooseDocumentT } from 'mongoose';
 export interface StoredMetadata {
    metadata: string,
    tokenId: string,
-   contractAddress: string}
+   contractAddress: string,
+   originalTokenHolder: string}
 
 export interface StoredMetadataDocument extends StoredMetadata, MongooseDocumentT {}
 
@@ -11,6 +12,7 @@ const StoredMetadataSchema = new mongoose.Schema<StoredMetadataDocument>({
     metadata: { type: String, required:true },
     tokenId: { type: String, required:true },
     contractAddress: { type: String, required:true },
+    originalTokenHolder: { type: String, required:true }
 });
 
 StoredMetadataSchema.index({ 'tokenId': 1, 'contractAddress': 1 }, { 'unique': true });//unique combination of two fields

@@ -1,5 +1,6 @@
 import  express  from 'express';
 import { StoredMetadataModel } from '../models/StoredMetadataModel';
+import { consentNeeded } from '../services/consentService';
 
 const metadataRouter = express.Router();
 
@@ -9,11 +10,16 @@ metadataRouter.get('/metadata/:contractAddress/:tokenId', async (req, res) => {
     const contractAddress = req.params.contractAddress;
 
     try {
-        const result = await StoredMetadataModel.findOne({ contractAddress, tokenId });
-        if (result) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const metadataObject = JSON.parse(result.metadata);
-            res.send(metadataObject);
+        const foundMetadata = await StoredMetadataModel.findOne({ contractAddress, tokenId });
+        if (foundMetadata) {
+            if (await consentGiven(foundMetadata.originalTokenHolder)) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const metadataObject = JSON.parse(foundMetadata.metadata);
+                res.send(metadataObject);
+            }
+            else {
+                res.status(403).send(`Missing metadata consent from address ${foundMetadata.originalTokenHolder}`);
+            }
         }
         else {
             res.status(400).send(`No metadata found for contract ${contractAddress} tokenId ${tokenId}`);
@@ -23,5 +29,9 @@ metadataRouter.get('/metadata/:contractAddress/:tokenId', async (req, res) => {
         res.status(500).send(`Server error ${error}`);
     }
 });
+
+const consentGiven = async (address: string) => {
+    return ! await consentNeeded(address);
+};
 
 export default metadataRouter;

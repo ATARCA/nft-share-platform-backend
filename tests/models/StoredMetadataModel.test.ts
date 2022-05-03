@@ -21,7 +21,8 @@ describe('StoredMetadataModel test', () => {
         const values = {
             metadata: 'this is metadata',
             tokenId: '1',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: 'address'
         };
         await new StoredMetadataModel(values ).save();
 
@@ -34,7 +35,8 @@ describe('StoredMetadataModel test', () => {
         const values = {
             metadata: 'this is metadata',
             tokenId: '1',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: 'address'
         };
 
         await new StoredMetadataModel( values ).save();
@@ -54,13 +56,15 @@ describe('StoredMetadataModel test', () => {
         const values1 = {
             metadata: 'this is metadata',
             tokenId: '1',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: 'address'
         };
 
         const values2 = {
             metadata: 'this is metadata',
             tokenId: '2',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: 'address'
         };
 
         await new StoredMetadataModel( values1 ).save();
@@ -74,13 +78,15 @@ describe('StoredMetadataModel test', () => {
         const values1 = {
             metadata: 'this is metadata',
             tokenId: '1',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: 'address'
         };
 
         const values2 = {
             metadata: 'this is metadata',
             tokenId: '1',
-            contractAddress: '0xAf9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'
+            contractAddress: '0xAf9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: 'address'
         };
 
         await new StoredMetadataModel( values1 ).save();
