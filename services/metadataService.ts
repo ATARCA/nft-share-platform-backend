@@ -1,9 +1,11 @@
 import { verifyMessage } from '@ethersproject/wallet';
 import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
 import { StoredMetadataModel } from '../models/StoredMetadataModel';
-import { StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
+import { StoredPendingMetadata, StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
 import { ShareableERC721__factory } from '../typechain-types';
 import { TransferEvent } from '../typechain-types/ERC721';
+import { Result } from '../types';
+import { verifyMessageSafe } from '../utils/cryptography';
 import { web3provider } from '../web3/web3provider';
 
 export const getMetadataUploadMessageToSign = (txHash: string, metadata: string): string => {
@@ -12,20 +14,11 @@ export const getMetadataUploadMessageToSign = (txHash: string, metadata: string)
 
 export const verifyMetadataSignature = (txHash: string, metadata: string, signingAddress: string, signature: string) => {
     const signedMessage = getMetadataUploadMessageToSign(txHash, metadata);
-
-    try {
-        const recoveredAddress = verifyMessage(signedMessage, signature).toLowerCase();
-        const isSignerMatching = !!(recoveredAddress === signingAddress.toLowerCase());
-        return isSignerMatching;
-    } catch (error) {
-        console.warn(`verifyMetadataSignature error for signature ${signature} and signed message ${signedMessage}`,error);
-        return false;
-    }
+    return verifyMessageSafe(signingAddress, signedMessage, signature);
 };
 
 
 export const checkLatestEventsAndPostMetadata = async () => {
-    
     console.log('polling events');
 
     const deployedContractDocuments = await DeployedTokenContractModel.find({});
@@ -64,4 +57,25 @@ const processEventsForNewlyMintedTokens = async (events: TransferEvent[]) => {
     });
 
     await Promise.all(promises);
+};
+
+export const addPendingMetadataFromClient = async (pendingTxHash: string, metadata: string, signingAddress: string, signature: string): Promise<Result> => {
+    const existingRecord = await StoredPendingMetadataModel.findOne({ pendingTxHash });
+    if (existingRecord) {
+        const result = { success: false, message: `Pending metadata for txHash ${pendingTxHash} already exist` };
+        return result;
+    }
+
+    const signatureValid = verifyMetadataSignature(pendingTxHash, metadata, signingAddress, signature);
+
+    if (signatureValid) {
+        const metadataRecord: StoredPendingMetadata = { metadata, pendingTxHash };
+        await new StoredPendingMetadataModel(metadataRecord).save();
+        const result: Result = { success: true };
+        return result;
+    }
+    else {
+        const result: Result = { success: false, message: 'Signature validation failed' };
+        return result;
+    }
 };
