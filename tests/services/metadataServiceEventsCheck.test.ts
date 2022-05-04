@@ -1,10 +1,10 @@
 import 'jest';
-import { initMongoose, shutdownMongoose } from '../app';
-import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
-import { StoredMetadataModel } from '../models/StoredMetadataModel';
-import { StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
-import { checkLatestEventsAndPostMetadata } from '../services/metadataService';
-import { initWeb3Provider, web3provider } from '../web3/web3provider';
+import { initMongoose, shutdownMongoose } from '../../app';
+import { DeployedTokenContractModel } from '../../models/DeployedTokenContractModel';
+import { StoredMetadataModel } from '../../models/StoredMetadataModel';
+import { StoredPendingMetadataModel } from '../../models/StoredPendingMetadataModel';
+import { checkLatestEventsAndPostMetadata } from '../../services/metadataService';
+import { initWeb3Provider, web3provider } from '../../web3/web3provider';
 
 describe('metadata update on share event', () => {
 

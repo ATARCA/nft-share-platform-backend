@@ -4,7 +4,6 @@ import { schemaDefs } from '../schema';
 import { resolvers } from '../resolvers';
 import { StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
 import { initMongoose, shutdownMongoose } from '../app';
-import { checkLatestEventsAndPostMetadata } from '../services/metadataService';
 import { web3provider } from '../web3/web3provider';
 
 describe('add metadata integration', () => {

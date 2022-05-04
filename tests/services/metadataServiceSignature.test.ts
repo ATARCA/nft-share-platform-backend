@@ -1,10 +1,7 @@
 import 'jest';
-import { initMongoose, shutdownMongoose } from '../app';
-import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
-import { StoredMetadataModel } from '../models/StoredMetadataModel';
-import { StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
-import { checkLatestEventsAndPostMetadata, verifyMetadataSignature } from '../services/metadataService';
-import { initWeb3Provider, web3provider } from '../web3/web3provider';
+import { shutdownMongoose } from '../../app';
+import { verifyMetadataSignature } from '../../services/metadataService';
+import { web3provider } from '../../web3/web3provider';
 
 describe('metadataService signature test', () => {
 
