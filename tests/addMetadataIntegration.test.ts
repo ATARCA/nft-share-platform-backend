@@ -4,6 +4,8 @@ import { schemaDefs } from '../schema';
 import { resolvers } from '../resolvers';
 import { StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
 import { initMongoose, shutdownMongoose } from '../app';
+import { checkLatestEventsAndPostMetadata } from '../services/metadataService';
+import { web3provider } from '../web3/web3provider';
 
 describe('add metadata integration', () => {
 
@@ -16,8 +18,8 @@ describe('add metadata integration', () => {
         }
       }`;
 
-    beforeAll(() => {
-        initMongoose();
+    beforeAll(async () => {
+        await initMongoose();
 
         testServer = new ApolloServer({
             typeDefs: schemaDefs,
@@ -32,6 +34,7 @@ describe('add metadata integration', () => {
     afterAll(async () => {
         await testServer.stop();
         await shutdownMongoose();
+        await web3provider.destroy();
     });
 
     it('can save metadata with correct signature', async () => {
@@ -93,4 +96,5 @@ describe('add metadata integration', () => {
         expect(secondResult.data?.addPendingMetadata.message).toBeDefined();
 
     });
+
 });

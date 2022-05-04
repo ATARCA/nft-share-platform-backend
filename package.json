@@ -8,7 +8,10 @@
     "dev": "ts-node-dev index.ts",
     "test": "rimraf ./build && cross-env NODE_ENV=test jest --runInBand  --verbose",
     "lint": "eslint --ext .ts .",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "contracts:clean": "rimraf src/typechain-types && rimraf src/abi-generated",
+    "contracts:removehardhatdependency": "rimraf typechain-types/hardhat.d.ts",
+    "contracts:update": "npm run contracts:clean && cd ../nft-share-platform-contracts && npm run build && copyfiles \"./typechain-types/**\" \"../nft-share-platform-backend\" && copyfiles \"./abi-generated/**\" \"../nft-share-platform-backend\" && cd ../nft-share-platform-backend && npm run contracts:removehardhatdependency"
   },
   "repository": {
     "type": "git",
@@ -26,6 +29,7 @@
     "apollo-server-core": "^3.6.3",
     "apollo-server-express": "^3.6.3",
     "dotenv": "^16.0.0",
+    "ethers": "^5.6.2",
     "express": "^4.17.2",
     "graphql": "^16.3.0",
     "graphql-tools": "^8.2.0",
