@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { StoredPendingMetadata, StoredPendingMetadataModel } from './models/StoredPendingMetadataModel';
+import { getConsentMessageToSign, addSignedConsent as handleAddSignedConsent, consentNeeded as handleConsentNeeded } from './services/consentService';
 import { multiply } from './services/demoService';
-import { getMetadataUploadMessageToSign, verifyMetadataSignature } from './services/metadataService';
-import { MultiplyPayloadDemo } from './types';
+import { addPendingMetadataFromClient, getMetadataUploadMessageToSign, verifyMetadataSignature } from './services/metadataService';
+import { MultiplyPayloadDemo, Result } from './types';
 
 export const resolvers = {
     Query: {
@@ -24,6 +25,15 @@ export const resolvers = {
             const metadata = args.metadata as string;
             const messageToSign = getMetadataUploadMessageToSign(txHash, metadata);
             return messageToSign;
+        },
+        async consentNeeded(_root: any, args: any) {
+            const address = args.address as string;
+            return await handleConsentNeeded(address);
+
+        },
+        getConsentMessageToSign(_root: any, _args: any) {
+            const text = getConsentMessageToSign();
+            return text;
         }
     },
     Mutation: {
@@ -33,24 +43,16 @@ export const resolvers = {
             const signingAddress = args.signingAddress as string;
             const signature = args.signature as string;
 
-            const existingRecord = await StoredPendingMetadataModel.findOne({ pendingTxHash });
-            if (existingRecord) {
-                const result = { success: false, message: `Pending metadata for txHash ${pendingTxHash} already exist` };
-                return result;
-            }
+            const result = await addPendingMetadataFromClient(pendingTxHash, metadata, signingAddress, signature);
+            return result;
+        },
+        async addSignedConsent(_root: any, args: any) {
+            const signingAddress = args.signingAddress as string;
+            const signature = args.signature as string;
+            const consentText = args.consentText as string;
 
-            const signatureValid = verifyMetadataSignature(pendingTxHash, metadata, signingAddress, signature);
-
-            if (signatureValid) {
-                const metadataRecord: StoredPendingMetadata = { metadata, pendingTxHash };
-                await new StoredPendingMetadataModel(metadataRecord).save();
-                const result = { success: true };
-                return result;
-            }
-            else {
-                const result = { success: false, message: 'Signature validation failed' };
-                return result;
-            }
+            const result = await handleAddSignedConsent(signingAddress, signature, consentText);
+            return result;
         }
     }
 };

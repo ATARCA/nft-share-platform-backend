@@ -20,6 +20,8 @@ export const schemaDefs: TypeSource = gql`
     allBooks: [Book!]!
     multiply(value1: Int!, value2: Int!): MultiplyResult!
     getMetadataUploadMessageToSign(txHash: String!, metadata: String!): String!
+    getConsentMessageToSign: String!
+    consentNeeded(address: String!): Boolean!
   }
 
   type Mutation {
@@ -28,6 +30,11 @@ export const schemaDefs: TypeSource = gql`
       metadata: String!,
       signingAddress: String!,
       signature: String!,
-    ): Result
+    ): Result!
+    addSignedConsent(
+      signingAddress: String!,
+      signature: String!,
+      consentText: String!
+    ): Result!
   }
 `;

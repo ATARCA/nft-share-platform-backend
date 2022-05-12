@@ -3,6 +3,7 @@ import supertest from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import { StoredMetadataModel } from '../../models/StoredMetadataModel';
 import { web3provider } from '../../web3/web3provider';
+import { StoredConsentModel } from '../../models/StoredConsentModel';
 
 const api = supertest(app);
 
@@ -11,7 +12,7 @@ describe('metadata router', () => {
 
     beforeEach( async () => {
         await StoredMetadataModel.deleteMany({});
-
+        await StoredConsentModel.deleteMany({});
     });
 
     beforeAll( async () => {
@@ -30,7 +31,9 @@ describe('metadata router', () => {
             description: 'token description'
         };
 
-        await new StoredMetadataModel({ contractAddress: '0x00AA', tokenId: '22', metadata: JSON.stringify(metadata) }).save();
+        await new StoredConsentModel({ address:'address that gave consent', consentText: 'consentText', signature: 'signature' }).save();
+        await new StoredMetadataModel({ contractAddress: '0x00AA', tokenId: '22', metadata: JSON.stringify(metadata), originalTokenHolder: 'address that gave consent' }).save();
+
         const response = await api.get('/metadata/0x00AA/22')
             .expect(StatusCodes.OK);
 
@@ -38,15 +41,19 @@ describe('metadata router', () => {
     });
 
     it('returns 400 for non-existing metadata', async () => {
+        await api.get('/metadata/0x00AA/22').expect(StatusCodes.BAD_REQUEST);
+    });
+
+    it('returns 403 if consent is missing', async () => {
 
         const metadata = {
             name: 'token name',
             description: 'token description'
         };
 
-        await new StoredMetadataModel({ contractAddress: '0x00AA', tokenId: '01', metadata: JSON.stringify(metadata) }).save();
+        await new StoredMetadataModel({ contractAddress: '0x00AA', tokenId: '22', metadata: JSON.stringify(metadata), originalTokenHolder: 'address gave no consent' }).save();
 
-        await api.get('/metadata/0x00AA/22').expect(StatusCodes.BAD_REQUEST);
-
+        await api.get('/metadata/0x00AA/22')
+            .expect(StatusCodes.FORBIDDEN);
     });
 });
