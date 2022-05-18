@@ -8,7 +8,7 @@ export interface StoredConsent {
 export interface StoredConsentDocument extends StoredConsent, MongooseDocumentT {}
 
 const StoredConsentSchema = new mongoose.Schema<StoredConsentDocument>({
-    address: { type: String, required:true, unique: true },
+    address: { type: String, lowercase:true, required:true, unique: true },
     consentText: { type: String, required:true },
     signature: { type: String, required:true },
 });
