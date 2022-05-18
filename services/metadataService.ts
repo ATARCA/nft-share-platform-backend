@@ -1,4 +1,3 @@
-import { verifyMessage } from '@ethersproject/wallet';
 import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
 import { StoredMetadataModel } from '../models/StoredMetadataModel';
 import { StoredPendingMetadata, StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
@@ -17,9 +16,17 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
     return verifyMessageSafe(signingAddress, signedMessage, signature);
 };
 
+const initiateStoredContractsIfEmpty = async () => {
+    const contracts = await DeployedTokenContractModel.find({});
+    if (contracts.length === 0) {
+        await new DeployedTokenContractModel({ address: '0x4381dBc9b27B035f87a04995400879Cd6e977AED' } ).save();
+    }
+};
 
 export const checkLatestEventsAndPostMetadata = async () => {
     console.log('polling events');
+
+    await initiateStoredContractsIfEmpty();
 
     const deployedContractDocuments = await DeployedTokenContractModel.find({});
 
@@ -38,7 +45,12 @@ export const checkLatestEventsAndPostMetadata = async () => {
     await Promise.all(contractWorkPromises);
 };
 
-const getNextBlockNumberToCheck = (lastCheckBlockNumber: number) => lastCheckBlockNumber +1; //filter block start and end block numbers are inclusive on both sides of the interval
+const checkBlockNumberOffset = 1000; //do not check only latest blocks, in case the metadata was uploaded late (after minting tx was mined)
+
+const getNextBlockNumberToCheck = (lastCheckBlockNumber: number) => {
+    const nextBlockToCheck = lastCheckBlockNumber - checkBlockNumberOffset; //filter block start and end block numbers are inclusive on both sides of the interval
+    return Math.max(nextBlockToCheck, 0);
+};
 
 const loadContract = (address: string) => {
     const contract = ShareableERC721__factory.connect(address, web3provider);
@@ -55,8 +67,15 @@ const processEventsForNewlyMintedTokens = async (events: TransferEvent[]) => {
             const tokenId = event.args.tokenId.toBigInt().toString();
             const contractAddress = event.address;
             const originalTokenHolder = event.args.to;
-            console.log('storing metadata', { metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder });
-            await new StoredMetadataModel({ metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder } ).save();
+            const existingMetadata = await StoredMetadataModel.find({ tokenId, contractAddress });
+
+            if (existingMetadata.length === 0) {
+                console.log('storing metadata', { metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder, transactionHash: event.transactionHash });
+                await new StoredMetadataModel({ metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder } ).save();
+            }
+            else {
+                console.log('metadata already stored for ', { tokenId, contractAddress });
+            }
         }
     });
 
@@ -73,7 +92,7 @@ export const addPendingMetadataFromClient = async (pendingTxHash: string, metada
     const signatureValid = verifyMetadataSignature(pendingTxHash, metadata, signingAddress, signature);
 
     if (signatureValid) {
-        const metadataRecord: StoredPendingMetadata = { metadata, pendingTxHash, mintingAddress: signingAddress };
+        const metadataRecord: StoredPendingMetadata = { metadata, pendingTxHash, mintingAddress: signingAddress.toLowerCase() };
         await new StoredPendingMetadataModel(metadataRecord).save();
         const result: Result = { success: true };
         return result;
