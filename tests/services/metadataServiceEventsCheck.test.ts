@@ -11,14 +11,14 @@ describe('metadata update on share event', () => {
     beforeAll(async () => {
         await initMongoose();
         initWeb3Provider();
-
-        await DeployedTokenContractModel.deleteMany({});
-        await new DeployedTokenContractModel({ address: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D' } ).save();
     });
 
     beforeEach( async () => {
         await StoredPendingMetadataModel.deleteMany({});
         await StoredMetadataModel.deleteMany({});
+
+        await DeployedTokenContractModel.deleteMany({});
+        await new DeployedTokenContractModel({ address: '0x4381dbc9b27b035f87a04995400879cd6e977aed' } ).save();
     });
 
     afterAll(async () => {
@@ -29,7 +29,8 @@ describe('metadata update on share event', () => {
     it('moves pending metadata to permanent metadata on event', async () => {
         await new StoredPendingMetadataModel({
             metadata: 'this is metadata',
-            pendingTxHash: '0x83ea84f850329e67646d4c641735ff5aab66535e14552a855f28fc5648d8c724' }).save();
+            mintingAddress: '0xbaf811debb67bf5fe7241f383192b97261f8e008',
+            pendingTxHash: '0x7f63615070dedb683c3e8b1b7b8a16757e333ba2769779fdba3f3c9f7be66722' }).save();
 
         await checkLatestEventsAndPostMetadata();
 
@@ -38,10 +39,24 @@ describe('metadata update on share event', () => {
         expect(allStoredMetada).toHaveLength(1);
         expect(allStoredMetada[0]).toMatchObject({
             metadata: 'this is metadata',
-            tokenId: '1',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
-            originalTokenHolder: '0xA86cb4378Cdbc327eF950789c81BcBcc3aa73D21'
+            tokenId: '15',
+            contractAddress: '0x4381dBc9b27B035f87a04995400879Cd6e977AED',
+            originalTokenHolder: '0x074f64B76fD5C83A9e0590c09BCd7D2B6FE3c1fD'
         });
+    });
+
+    it('pending metadata from different address are not moved', async () => {
+
+        await new StoredPendingMetadataModel({
+            metadata: 'this is metadata',
+            mintingAddress: '0xbbf811debb67bf5fe7241f383192b97261f8e008',
+            pendingTxHash: '0x7f63615070dedb683c3e8b1b7b8a16757e333ba2769779fdba3f3c9f7be66722' }).save();
+
+        await checkLatestEventsAndPostMetadata();
+
+        const allStoredMetada = await StoredMetadataModel.find({});
+
+        expect(allStoredMetada).toHaveLength(0);
     });
 
 });

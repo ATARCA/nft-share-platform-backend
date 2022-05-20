@@ -47,7 +47,10 @@ const loadContract = (address: string) => {
 
 const processEventsForNewlyMintedTokens = async (events: TransferEvent[]) => {
     const promises = events.map( async (event) => {
-        const pendingMetadata = await StoredPendingMetadataModel.findOne({ pendingTxHash:event.transactionHash });
+        const transactionReceipt = await web3provider.getTransactionReceipt(event.transactionHash);
+        const mintingAddress = transactionReceipt.from.toLowerCase();
+
+        const pendingMetadata = await StoredPendingMetadataModel.findOne({ pendingTxHash:event.transactionHash, mintingAddress });
         if (pendingMetadata) {
             const tokenId = event.args.tokenId.toBigInt().toString();
             const contractAddress = event.address;
@@ -70,7 +73,7 @@ export const addPendingMetadataFromClient = async (pendingTxHash: string, metada
     const signatureValid = verifyMetadataSignature(pendingTxHash, metadata, signingAddress, signature);
 
     if (signatureValid) {
-        const metadataRecord: StoredPendingMetadata = { metadata, pendingTxHash };
+        const metadataRecord: StoredPendingMetadata = { metadata, pendingTxHash, mintingAddress: signingAddress };
         await new StoredPendingMetadataModel(metadataRecord).save();
         const result: Result = { success: true };
         return result;

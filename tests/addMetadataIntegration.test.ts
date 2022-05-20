@@ -49,6 +49,12 @@ describe('add metadata integration', () => {
         });
 
         expect(result.data?.addPendingMetadata.success).toBe(true);
+
+        const storedMetadata = await StoredPendingMetadataModel.find({});
+        expect(storedMetadata).toHaveLength(1);
+        expect(storedMetadata[0]).toMatchObject({ pendingTxHash: 'txHashIsThis',
+            metadata: 'This is metadata',
+            mintingAddress: '0xE54BB854621E8CA08666082ABE50a9f4316469BB' });
     });
 
     it('will not save metadata that do not match signature', async () => {
@@ -66,6 +72,8 @@ describe('add metadata integration', () => {
         expect(result.data?.addPendingMetadata.success).toBe(false);
         expect(result.data?.addPendingMetadata.message).toBeDefined();
 
+        const storedMetadata = await StoredPendingMetadataModel.find({});
+        expect(storedMetadata).toHaveLength(0);
     });
 
     it('cannot save the same metadata twice', async () => {
@@ -94,6 +102,8 @@ describe('add metadata integration', () => {
         expect(secondResult.data?.addPendingMetadata.success).toBe(false);
         expect(secondResult.data?.addPendingMetadata.message).toBeDefined();
 
+        const storedMetadata = await StoredPendingMetadataModel.find({});
+        expect(storedMetadata).toHaveLength(1);
     });
 
 });

@@ -2,13 +2,17 @@ import mongoose, { Document as MongooseDocumentT } from 'mongoose';
 
 export interface StoredPendingMetadata {
    metadata: string,
+   mintingAddress: string,
    pendingTxHash: string}
 
 export interface StoredPendingMetadataDocument extends StoredPendingMetadata, MongooseDocumentT {}
 
 const storedPendingMetadataSchema = new mongoose.Schema<StoredPendingMetadataDocument>({
     metadata: { type: String, required:true },
+    mintingAddress: { type: String, required:true },
     pendingTxHash: { type: String, required:true, unique: true } });
+
+storedPendingMetadataSchema.index({ 'mintingAddress': 1, 'pendingTxHash': 1 }, { 'unique': true });//unique combination of two fields
 
 //set schema not to return _id and __v (version)
 storedPendingMetadataSchema.set('toJSON', {
