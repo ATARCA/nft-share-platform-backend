@@ -40,6 +40,22 @@ describe('metadata router', () => {
         expect(response.body).toMatchObject(metadata);
     });
 
+    it('ignores case of contract address for stored metadata', async () => {
+
+        const metadata = {
+            name: 'token name',
+            description: 'token description'
+        };
+
+        await new StoredConsentModel({ address:'address that gave consent', consentText: 'consentText', signature: 'signature' }).save();
+        await new StoredMetadataModel({ contractAddress: '0x00aa', tokenId: '22', metadata: JSON.stringify(metadata), originalTokenHolder: 'address that gave consent' }).save();
+
+        const response = await api.get('/metadata/0x00AA/22')
+            .expect(StatusCodes.OK);
+
+        expect(response.body).toMatchObject(metadata);
+    });
+
     it('returns 400 for non-existing metadata', async () => {
         await api.get('/metadata/0x00AA/22').expect(StatusCodes.BAD_REQUEST);
     });

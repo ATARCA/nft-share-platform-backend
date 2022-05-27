@@ -22,6 +22,7 @@ describe('metadata update on share event', () => {
     });
 
     afterAll(async () => {
+        await DeployedTokenContractModel.deleteMany({});
         await web3provider.destroy();
         await shutdownMongoose();
     });
@@ -40,8 +41,8 @@ describe('metadata update on share event', () => {
         expect(allStoredMetada[0]).toMatchObject({
             metadata: 'this is metadata',
             tokenId: '15',
-            contractAddress: '0x4381dBc9b27B035f87a04995400879Cd6e977AED',
-            originalTokenHolder: '0x074f64B76fD5C83A9e0590c09BCd7D2B6FE3c1fD'
+            contractAddress: '0x4381dBc9b27B035f87a04995400879Cd6e977AED'.toLowerCase(),
+            originalTokenHolder: '0x074f64B76fD5C83A9e0590c09BCd7D2B6FE3c1fD'.toLowerCase()
         });
     });
 

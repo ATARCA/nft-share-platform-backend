@@ -21,7 +21,7 @@ describe('StoredMetadataModel test', () => {
         const values = {
             metadata: 'this is metadata',
             tokenId: '1',
-            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'.toLowerCase(),
             originalTokenHolder: 'address'
         };
         await new StoredMetadataModel(values ).save();
@@ -50,6 +50,28 @@ describe('StoredMetadataModel test', () => {
         }
 
         expect(exceptionThrown).toBe(true);
+    });
+
+    it('enforces lower case for addresses', async () => {
+        const values = {
+            metadata: 'this is Metadata',
+            tokenId: '1',
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D',
+            originalTokenHolder: 'Address'
+        };
+
+        const valuesLowerCase = {
+            metadata: 'this is Metadata',
+            tokenId: '1',
+            contractAddress: '0x8f9a72d9E9D66dD330Cf669F143B14f4EfCd6A4D'.toLowerCase(),
+            originalTokenHolder: 'Address'.toLowerCase()
+        };
+
+        await new StoredMetadataModel( values ).save();
+
+        const documents = await StoredMetadataModel.find({});
+
+        expect(documents[0]).toMatchObject(valuesLowerCase);
     });
 
     it('can save metadata for different tokens on the same contract', async () => {

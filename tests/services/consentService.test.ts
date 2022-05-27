@@ -163,7 +163,7 @@ describe('consent service', () => {
 
         const allConsents = await StoredConsentModel.find({});
         expect(allConsents).toHaveLength(1);
-        expect(allConsents[0]).toMatchObject({ address: signingAddress, consentText, signature });
+        expect(allConsents[0]).toMatchObject({ address: signingAddress.toLowerCase(), consentText, signature });
 
         const consentNeededresult = await testServer.executeOperation({
             query: consentNeededQuery,
@@ -238,7 +238,7 @@ describe('consent service', () => {
 
         const allConsents = await StoredConsentModel.find({});
         expect(allConsents).toHaveLength(1);
-        expect(allConsents[0]).toMatchObject({ address: signingAddress, consentText, signature });
+        expect(allConsents[0]).toMatchObject({ address: signingAddress.toLowerCase(), consentText, signature });
 
         const consentNeededresult = await testServer.executeOperation({
             query: consentNeededQuery,

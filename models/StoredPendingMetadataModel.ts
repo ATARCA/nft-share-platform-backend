@@ -9,7 +9,7 @@ export interface StoredPendingMetadataDocument extends StoredPendingMetadata, Mo
 
 const storedPendingMetadataSchema = new mongoose.Schema<StoredPendingMetadataDocument>({
     metadata: { type: String, required:true },
-    mintingAddress: { type: String, required:true },
+    mintingAddress: { type: String, lowercase: true, required:true },
     pendingTxHash: { type: String, required:true, unique: true } });
 
 storedPendingMetadataSchema.index({ 'mintingAddress': 1, 'pendingTxHash': 1 }, { 'unique': true });//unique combination of two fields

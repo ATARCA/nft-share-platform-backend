@@ -11,8 +11,8 @@ export interface StoredMetadataDocument extends StoredMetadata, MongooseDocument
 const StoredMetadataSchema = new mongoose.Schema<StoredMetadataDocument>({
     metadata: { type: String, required:true },
     tokenId: { type: String, required:true },
-    contractAddress: { type: String, required:true },
-    originalTokenHolder: { type: String, required:true }
+    contractAddress: { type: String, lowercase: true, required:true },
+    originalTokenHolder: { type: String, lowercase: true, required:true }
 });
 
 StoredMetadataSchema.index({ 'tokenId': 1, 'contractAddress': 1 }, { 'unique': true });//unique combination of two fields

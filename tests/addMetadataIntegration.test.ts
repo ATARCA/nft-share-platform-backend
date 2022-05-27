@@ -54,7 +54,7 @@ describe('add metadata integration', () => {
         expect(storedMetadata).toHaveLength(1);
         expect(storedMetadata[0]).toMatchObject({ pendingTxHash: 'txHashIsThis',
             metadata: 'This is metadata',
-            mintingAddress: '0xE54BB854621E8CA08666082ABE50a9f4316469BB' });
+            mintingAddress: '0xE54BB854621E8CA08666082ABE50a9f4316469BB'.toLowerCase() });
     });
 
     it('will not save metadata that do not match signature', async () => {
