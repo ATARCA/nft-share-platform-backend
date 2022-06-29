@@ -6,9 +6,12 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "ts-node-dev index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "rimraf ./build && cross-env NODE_ENV=test jest --runInBand  --verbose --forceExit",
     "lint": "eslint --ext .ts .",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "contracts:clean": "rimraf src/typechain-types && rimraf src/abi-generated",
+    "contracts:removehardhatdependency": "rimraf typechain-types/hardhat.d.ts",
+    "contracts:update": "npm run contracts:clean && cd ../nft-share-platform-contracts && npm run build && copyfiles \"./typechain-types/**\" \"../nft-share-platform-backend\" && copyfiles \"./abi-generated/**\" \"../nft-share-platform-backend\" && cd ../nft-share-platform-backend && npm run contracts:removehardhatdependency"
   },
   "repository": {
     "type": "git",
@@ -21,21 +24,33 @@
   },
   "homepage": "https://github.com/ATARCA/nft-share-platform-backend#readme",
   "dependencies": {
+    "@ethersproject/wallet": "^5.6.0",
     "apollo-server": "^3.6.3",
     "apollo-server-core": "^3.6.3",
     "apollo-server-express": "^3.6.3",
+    "dotenv": "^16.0.0",
+    "ethers": "^5.6.2",
     "express": "^4.17.2",
     "graphql": "^16.3.0",
     "graphql-tools": "^8.2.0",
+    "mongoose": "^6.2.10",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
+    "@types/http-status-codes": "^1.2.0",
+    "@types/jest": "^27.4.1",
     "@types/morgan": "^1.9.3",
     "@types/node": "^17.0.13",
+    "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
+    "cross-env": "^7.0.3",
     "eslint": "^8.8.0",
+    "jest": "^27.5.1",
+    "rimraf": "^3.0.2",
+    "supertest": "^6.2.2",
+    "ts-jest": "^27.1.4",
     "ts-node": "^10.4.0",
     "ts-node-dev": "^1.1.8",
     "tslib": "^2.3.1",

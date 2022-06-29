@@ -1,10 +1,13 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { schemaDefs } from './schema';
 import { resolvers } from './resolvers';
 import http from 'http';
-import app from './app';
+import { app } from './app';
 import { initAppMiddleware } from './app';
 import { GraphQLSchema } from 'graphql';
 
