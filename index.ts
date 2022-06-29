@@ -11,7 +11,7 @@ import { app } from './app';
 import { initAppMiddleware } from './app';
 import { GraphQLSchema } from 'graphql';
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 async function startApolloServer(schema: GraphQLSchema) {
     const httpServer = http.createServer(app);
