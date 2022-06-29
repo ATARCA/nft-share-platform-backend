@@ -18,6 +18,8 @@ jobs:
             npm install
             npm run lint
             npm run tsc
+        - name: Add procfile to build folder
+          run: cp Procfile ./build/
         - name: Generate deployment package
           run: zip -r package.zip ./build -x ".git/*" -x ".github/*" -x ".vscode/*"
 
