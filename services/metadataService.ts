@@ -2,7 +2,7 @@ import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel
 import { StoredMetadataModel } from '../models/StoredMetadataModel';
 import { StoredPendingMetadata, StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
 import { ShareableERC721__factory } from '../typechain-types';
-import { TransferEvent } from '../typechain-types/ERC721';
+import { TransferEvent } from '../typechain-types/ERC721Upgradeable';
 import { Result } from '../types';
 import { verifyMessageSafe } from '../utils/cryptography';
 import { web3provider } from '../web3/web3provider';
@@ -19,13 +19,13 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
 const initiateStoredContractsIfEmpty = async () => {
     const contracts = await DeployedTokenContractModel.find({});
     if (contracts.length === 0) {
-        await new DeployedTokenContractModel({ address: '0x4381dBc9b27B035f87a04995400879Cd6e977AED' } ).save();
+        await new DeployedTokenContractModel({ address: '0x4F494D371f71969140Bf03754C8be787c42BfA70' } ).save();
     }
 };
 
 export const checkLatestEventsAndPostMetadata = async () => {
     console.log('polling events');
-
+    await DeployedTokenContractModel.deleteMany({});
     await initiateStoredContractsIfEmpty();
 
     const deployedContractDocuments = await DeployedTokenContractModel.find({});
@@ -70,7 +70,7 @@ const processEventsForNewlyMintedTokens = async (events: TransferEvent[]) => {
             const existingMetadata = await StoredMetadataModel.find({ tokenId, contractAddress });
 
             if (existingMetadata.length === 0) {
-                console.log('storing metadata', { metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder, transactionHash: event.transactionHash });
+                console.log('storing metadata',  { metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder, transactionHash: event.transactionHash });
                 await new StoredMetadataModel({ metadata: pendingMetadata.metadata, tokenId, contractAddress, originalTokenHolder } ).save();
             }
             else {
