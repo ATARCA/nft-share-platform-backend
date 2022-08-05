@@ -5,9 +5,9 @@
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import type {
-  ERC721URIStorage,
-  ERC721URIStorageInterface,
-} from "../ERC721URIStorage";
+  IShareableERC721,
+  IShareableERC721Interface,
+} from "../IShareableERC721";
 
 const _abi = [
   {
@@ -115,7 +115,7 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "",
+        name: "balance",
         type: "uint256",
       },
     ],
@@ -134,7 +134,7 @@ const _abi = [
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "operator",
         type: "address",
       },
     ],
@@ -190,7 +190,7 @@ const _abi = [
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "owner",
         type: "address",
       },
     ],
@@ -239,7 +239,7 @@ const _abi = [
       },
       {
         internalType: "bytes",
-        name: "_data",
+        name: "data",
         type: "bytes",
       },
     ],
@@ -257,7 +257,7 @@ const _abi = [
       },
       {
         internalType: "bool",
-        name: "approved",
+        name: "_approved",
         type: "bool",
       },
     ],
@@ -293,6 +293,25 @@ const _abi = [
         internalType: "string",
         name: "",
         type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "tokenExists",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -342,15 +361,15 @@ const _abi = [
   },
 ];
 
-export class ERC721URIStorage__factory {
+export class IShareableERC721__factory {
   static readonly abi = _abi;
-  static createInterface(): ERC721URIStorageInterface {
-    return new utils.Interface(_abi) as ERC721URIStorageInterface;
+  static createInterface(): IShareableERC721Interface {
+    return new utils.Interface(_abi) as IShareableERC721Interface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): ERC721URIStorage {
-    return new Contract(address, _abi, signerOrProvider) as ERC721URIStorage;
+  ): IShareableERC721 {
+    return new Contract(address, _abi, signerOrProvider) as IShareableERC721;
   }
 }
