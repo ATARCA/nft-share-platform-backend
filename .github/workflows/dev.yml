@@ -1,4 +1,4 @@
-name: Deploy To Beanstalk
+name: Deploy to development server
 on: 
   workflow_dispatch:
   push:
