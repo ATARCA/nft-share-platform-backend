@@ -19,7 +19,7 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
 const initiateStoredContractsIfEmpty = async () => {
     const contracts = await DeployedTokenContractModel.find({});
     if (contracts.length === 0) {
-        await new DeployedTokenContractModel({ address: '0x4F494D371f71969140Bf03754C8be787c42BfA70' } ).save();
+        await new DeployedTokenContractModel({ address: '0xD7BB5c81056Ae9DA36c965F27f052C86aB9bCEC4' } ).save();
     }
 };
 
