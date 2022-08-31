@@ -7,7 +7,7 @@ import { Result } from '../types';
 import { verifyMessageSafe } from '../utils/cryptography';
 import { web3provider } from '../web3/web3provider';
 
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || '0xD7BB5c81056Ae9DA36c965F27f052C86aB9bCEC4'
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || '0xD7BB5c81056Ae9DA36c965F27f052C86aB9bCEC4';
 
 export const getMetadataUploadMessageToSign = (txHash: string, metadata: string): string => {
     return `Sign metadata to be uploaded \n txHash ${txHash} \n metadata ${metadata}`;
@@ -26,7 +26,7 @@ const initiateStoredContractsIfEmpty = async () => {
 };
 
 export const checkLatestEventsAndPostMetadata = async () => {
-    console.log('polling events');
+    console.log('polling events from ' + CONTRACT_ADDRESS);
     await DeployedTokenContractModel.deleteMany({});
     await initiateStoredContractsIfEmpty();
 
