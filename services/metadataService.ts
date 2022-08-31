@@ -36,16 +36,16 @@ export const checkLatestEventsAndPostMetadata = async () => {
         const filter = contract.filters.Transfer();//Transfer event is emited when new Token is minted
         const latestBlock = await web3provider.getBlockNumber();
         const lastCheckedBlockNumber = contractDocument.lastCheckedBlockNumber;
-        var checkUpToBlock = latestBlock;
-        console.log('blockheight on chain ', latestBlock)
-        console.log('latest blocknumber in metadata db', lastCheckedBlockNumber)
+        let checkUpToBlock = latestBlock;
+        console.log('blockheight on chain ', latestBlock);
+        console.log('latest blocknumber in metadata db', lastCheckedBlockNumber);
         //Todo: proceed in increments of 3000 if the difference of blocks is greater than 3000
         //Magic number, Infura supports only querying up to 3500 blocks from polygon network
         if ((latestBlock - lastCheckedBlockNumber) > 2000) {
             checkUpToBlock = lastCheckedBlockNumber + 2000;
         }
-        console.log('checking from', getNextBlockNumberToCheck(lastCheckedBlockNumber))
-        console.log('       ...to ', checkUpToBlock)
+        console.log('checking from', getNextBlockNumberToCheck(lastCheckedBlockNumber));
+        console.log('       ...to ', checkUpToBlock);
 
         const events = await contract.queryFilter(filter, getNextBlockNumberToCheck(lastCheckedBlockNumber), checkUpToBlock);
         await processEventsForNewlyMintedTokens(events);
