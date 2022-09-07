@@ -7,9 +7,11 @@ export interface DeployedTokenContract {
 
 export interface DeployedTokenContractDocument extends DeployedTokenContract, MongooseDocumentT {}
 
+const START_BLOCK_HEIGHT = Number(process.env.START_BLOCK_HEIGHT) || 0;
+
 const DeployedTokenContractSchema = new mongoose.Schema<DeployedTokenContractDocument>({
     address: { type: String, required:true, unique: true },
-    lastCheckedBlockNumber: { type: Number, required:true, default: 0 }
+    lastCheckedBlockNumber: { type: Number, required:true, default: START_BLOCK_HEIGHT }
 });
 
 //set schema not to return _id and __v (version)

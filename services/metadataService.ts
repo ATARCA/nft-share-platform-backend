@@ -7,6 +7,8 @@ import { Result } from '../types';
 import { verifyMessageSafe } from '../utils/cryptography';
 import { web3provider } from '../web3/web3provider';
 
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || '0xD7BB5c81056Ae9DA36c965F27f052C86aB9bCEC4';
+
 export const getMetadataUploadMessageToSign = (txHash: string, metadata: string): string => {
     return `Sign metadata to be uploaded \n txHash ${txHash} \n metadata ${metadata}`;
 };
@@ -19,13 +21,12 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
 const initiateStoredContractsIfEmpty = async () => {
     const contracts = await DeployedTokenContractModel.find({});
     if (contracts.length === 0) {
-        await new DeployedTokenContractModel({ address: '0xD7BB5c81056Ae9DA36c965F27f052C86aB9bCEC4' } ).save();
+        await new DeployedTokenContractModel({ address: CONTRACT_ADDRESS } ).save();
     }
 };
 
 export const checkLatestEventsAndPostMetadata = async () => {
-    console.log('polling events');
-    await DeployedTokenContractModel.deleteMany({});
+    console.log('polling events from ' + CONTRACT_ADDRESS);
     await initiateStoredContractsIfEmpty();
 
     const deployedContractDocuments = await DeployedTokenContractModel.find({});
@@ -33,12 +34,22 @@ export const checkLatestEventsAndPostMetadata = async () => {
     const contractWorkPromises = deployedContractDocuments.map(async contractDocument => {
         const contract = loadContract(contractDocument.address);
         const filter = contract.filters.Transfer();//Transfer event is emited when new Token is minted
-
         const latestBlock = await web3provider.getBlockNumber();
         const lastCheckedBlockNumber = contractDocument.lastCheckedBlockNumber;
-        const events = await contract.queryFilter(filter, getNextBlockNumberToCheck(lastCheckedBlockNumber), latestBlock);
+        let checkUpToBlock = latestBlock;
+        console.log('blockheight on chain ', latestBlock);
+        console.log('latest blocknumber in metadata db', lastCheckedBlockNumber);
+        //Todo: proceed in increments of 3000 if the difference of blocks is greater than 3000
+        //Magic number, Infura supports only querying up to 3500 blocks from polygon network
+        if ((latestBlock - lastCheckedBlockNumber) > 2000) {
+            checkUpToBlock = lastCheckedBlockNumber + 2000;
+        }
+        console.log('checking from', getNextBlockNumberToCheck(lastCheckedBlockNumber));
+        console.log('       ...to ', checkUpToBlock);
+
+        const events = await contract.queryFilter(filter, getNextBlockNumberToCheck(lastCheckedBlockNumber), checkUpToBlock);
         await processEventsForNewlyMintedTokens(events);
-        contractDocument.lastCheckedBlockNumber = latestBlock;
+        contractDocument.lastCheckedBlockNumber = Number(checkUpToBlock);
         await contractDocument.save();
     });
 
