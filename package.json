@@ -13,7 +13,7 @@
     "contracts:removehardhatdependency": "rimraf typechain-types/hardhat.d.ts",
     "contracts:update": "npm run contracts:clean && cd ../nft-share-platform-contracts && npm run build && copyfiles \"./typechain-types/**\" \"../nft-share-platform-backend\" && copyfiles \"./abi-generated/**\" \"../nft-share-platform-backend\" && cd ../nft-share-platform-backend && npm run contracts:removehardhatdependency",
     "thegraph:schema:download": "apollo schema:download --endpoint=https://api.thegraph.com/subgraphs/name/atarca/nft-share-platform-goerli thegraph-graphql-schema.json",
-    "thegraph:schema:codegen": "apollo codegen:generate --localSchemaFile=thegraph-graphql-schema.json --target=typescript --includes=subgraph/queries/**/*.ts --tagName=gql --addTypename --globalTypesFile=src/types-thegraph/thegraph-global-types.ts types-thegraph"
+    "thegraph:schema:codegen": "apollo codegen:generate --localSchemaFile=thegraph-graphql-schema.json --target=typescript --includes=subgraph/queries/**/*.ts --tagName=gql --addTypename --globalTypesFile=subgraph/types-thegraph/thegraph-global-types.ts types-thegraph"
   },
   "repository": {
     "type": "git",

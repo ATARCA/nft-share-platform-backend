@@ -1,7 +1,8 @@
-import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
+import { DeployedTokenContractDocument, DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
 import { StoredMetadataModel } from '../models/StoredMetadataModel';
 import { StoredPendingMetadata, StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
 import { GET_ALL_PROJECTS } from '../subgraph/queries/queries';
+import { ProjectDetailsQuery } from '../subgraph/queries/types-thegraph/ProjectDetailsQuery';
 import { theGraphApolloClient } from '../subgraph/theGraphApolloClient';
 import { ShareableERC721__factory } from '../typechain-types';
 import { TransferEvent } from '../typechain-types/ERC721Upgradeable';
@@ -9,7 +10,10 @@ import { Result } from '../types';
 import { verifyMessageSafe } from '../utils/cryptography';
 import { web3provider } from '../web3/web3provider';
 
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || '0xD7BB5c81056Ae9DA36c965F27f052C86aB9bCEC4';
+//Infura supports only querying up to 3500 blocks from polygon network
+//see https://community.infura.io/t/why-cant-we-scan-the-full-events-logs-for-polygon/4489
+const MAX_BLOCKS_IN_ONE_QUERY = 2000;
+const CHECK_OLD_BLOCKS_OFFSET = 1000; //do not check only latest blocks, in case the metadata was uploaded late (after minting tx was mined)
 
 export const getMetadataUploadMessageToSign = (txHash: string, metadata: string): string => {
     return `Sign metadata to be uploaded \n txHash ${txHash} \n metadata ${metadata}`;
@@ -20,52 +24,76 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
     return verifyMessageSafe(signingAddress, signedMessage, signature);
 };
 
-const addNewContractsFromSubgraph = async () => {
-    const contracts = await DeployedTokenContractModel.find({});
+const addMissingContractsFromSubgraph = async () => {
+    const result = await theGraphApolloClient.query<ProjectDetailsQuery, undefined>({ query: GET_ALL_PROJECTS });
 
-    const result = await theGraphApolloClient.query({ query: GET_ALL_PROJECTS });
-    console.log('result ', result.data);
+    const addMissingContractsPromises = result.data.projects.map ( async project => {
+        const contractAddress = project.shareableContractAddress as string;
+        const foundContracts = await DeployedTokenContractModel.find({ address: contractAddress });
+        if (foundContracts.length === 0) {
+            console.log('Adding new share contract at ', contractAddress);
+            await new DeployedTokenContractModel({ address: contractAddress }).save();
+        }
+    });
 
-    if (contracts.length === 0) {
-        await new DeployedTokenContractModel({ address: CONTRACT_ADDRESS } ).save();
-    }
+    await Promise.all(addMissingContractsPromises);
 };
 
-export const checkLatestEventsAndPostMetadata = async () => {
-    console.log('polling events from ' + CONTRACT_ADDRESS);
-    await addNewContractsFromSubgraph();
+let checkEventsInProgress = false;
 
+export const checkLatestEventsAndPostMetadata = async () => {
+    await addMissingContractsFromSubgraph();
+
+    if (checkEventsInProgress) {
+        console.warn('check latest metadata already in progress - skipping');
+        return;
+    }
+
+    checkEventsInProgress = true;
     const deployedContractDocuments = await DeployedTokenContractModel.find({});
 
     const contractWorkPromises = deployedContractDocuments.map(async contractDocument => {
-        const contract = loadContract(contractDocument.address);
-        const filter = contract.filters.Transfer();//Transfer event is emited when new Token is minted
-        const latestBlock = await web3provider.getBlockNumber();
-        const lastCheckedBlockNumber = contractDocument.lastCheckedBlockNumber;
-        let checkUpToBlock = latestBlock;
-        console.log('blockheight on chain ', latestBlock);
-        console.log('latest blocknumber in metadata db', lastCheckedBlockNumber);
-        //Todo: proceed in increments of 3000 if the difference of blocks is greater than 3000
-        //Magic number, Infura supports only querying up to 3500 blocks from polygon network
-        if ((latestBlock - lastCheckedBlockNumber) > 2000) {
-            checkUpToBlock = lastCheckedBlockNumber + 2000;
-        }
-        console.log('checking from', getNextBlockNumberToCheck(lastCheckedBlockNumber));
-        console.log('       ...to ', checkUpToBlock);
-
-        const events = await contract.queryFilter(filter, getNextBlockNumberToCheck(lastCheckedBlockNumber), checkUpToBlock);
-        await processEventsForNewlyMintedTokens(events);
-        contractDocument.lastCheckedBlockNumber = Number(checkUpToBlock);
-        await contractDocument.save();
+        await checkEventsForContract(contractDocument);
     });
 
     await Promise.all(contractWorkPromises);
+    checkEventsInProgress = false;
 };
 
-const checkBlockNumberOffset = 1000; //do not check only latest blocks, in case the metadata was uploaded late (after minting tx was mined)
+const checkEventsForContract = async (contractDocument: DeployedTokenContractDocument & { _id: any; }) => {
+    const contract = loadContract(contractDocument.address);
 
-const getNextBlockNumberToCheck = (lastCheckBlockNumber: number) => {
-    const nextBlockToCheck = lastCheckBlockNumber - checkBlockNumberOffset; //filter block start and end block numbers are inclusive on both sides of the interval
+    console.log('polling events from ' + contract.address);
+
+    const filter = contract.filters.Transfer();//Transfer event is emited when new Token is minted
+    const latestBlock = await web3provider.getBlockNumber();
+    let lastCheckedBlockNumber = contractDocument.lastCheckedBlockNumber;
+    let checkUpToBlock = latestBlock;
+    console.log('blockheight on chain ', latestBlock);
+    console.log('latest blocknumber in metadata db', lastCheckedBlockNumber);
+
+    do {
+        checkUpToBlock = latestBlock;
+
+        if ((checkUpToBlock - lastCheckedBlockNumber) > MAX_BLOCKS_IN_ONE_QUERY) {
+            checkUpToBlock = lastCheckedBlockNumber + MAX_BLOCKS_IN_ONE_QUERY;
+        }
+
+        console.log('checking from', getNextStartBlockNumberToCheck(lastCheckedBlockNumber));
+        console.log('       ...to ', checkUpToBlock);
+        const events = await contract.queryFilter(filter, getNextStartBlockNumberToCheck(lastCheckedBlockNumber), checkUpToBlock);
+        await processEventsForNewlyMintedTokens(events);
+
+        lastCheckedBlockNumber = checkUpToBlock;
+
+    } while (checkUpToBlock < latestBlock);
+
+    contractDocument.lastCheckedBlockNumber = Number(lastCheckedBlockNumber);
+    await contractDocument.save();
+};
+
+const getNextStartBlockNumberToCheck = (lastCheckBlockNumber: number) => {
+    const nextBlockToCheck = lastCheckBlockNumber - CHECK_OLD_BLOCKS_OFFSET; //filter block start and end block numbers are inclusive on both sides of the interval
     return Math.max(nextBlockToCheck, 0);
 };
 
