@@ -1,6 +1,8 @@
 import { DeployedTokenContractModel } from '../models/DeployedTokenContractModel';
 import { StoredMetadataModel } from '../models/StoredMetadataModel';
 import { StoredPendingMetadata, StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
+import { GET_ALL_PROJECTS } from '../subgraph/queries/queries';
+import { theGraphApolloClient } from '../subgraph/theGraphApolloClient';
 import { ShareableERC721__factory } from '../typechain-types';
 import { TransferEvent } from '../typechain-types/ERC721Upgradeable';
 import { Result } from '../types';
@@ -18,8 +20,12 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
     return verifyMessageSafe(signingAddress, signedMessage, signature);
 };
 
-const initiateStoredContractsIfEmpty = async () => {
+const addNewContractsFromSubgraph = async () => {
     const contracts = await DeployedTokenContractModel.find({});
+
+    const result = await theGraphApolloClient.query({ query: GET_ALL_PROJECTS });
+    console.log('result ', result.data);
+
     if (contracts.length === 0) {
         await new DeployedTokenContractModel({ address: CONTRACT_ADDRESS } ).save();
     }
@@ -27,7 +33,7 @@ const initiateStoredContractsIfEmpty = async () => {
 
 export const checkLatestEventsAndPostMetadata = async () => {
     console.log('polling events from ' + CONTRACT_ADDRESS);
-    await initiateStoredContractsIfEmpty();
+    await addNewContractsFromSubgraph();
 
     const deployedContractDocuments = await DeployedTokenContractModel.find({});
 
