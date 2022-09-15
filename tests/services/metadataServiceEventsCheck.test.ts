@@ -9,6 +9,8 @@ import { initWeb3Provider, web3provider } from '../../web3/web3provider';
 describe('metadata update on share event', () => {
 
     beforeAll(async () => {
+        process.env.START_BLOCK_HEIGHT = '12258810';
+
         await initMongoose();
         initWeb3Provider();
     });

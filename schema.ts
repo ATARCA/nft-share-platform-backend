@@ -21,6 +21,7 @@ export const schemaDefs: TypeSource = gql`
     multiply(value1: Int!, value2: Int!): MultiplyResult!
     getMetadataUploadMessageToSign(txHash: String!, metadata: String!): String!
     getConsentMessageToSign: String!
+    getRevokeConsentMessageToSign: String!
     consentNeeded(address: String!): Boolean!
   }
 
@@ -32,6 +33,11 @@ export const schemaDefs: TypeSource = gql`
       signature: String!,
     ): Result!
     addSignedConsent(
+      signingAddress: String!,
+      signature: String!,
+      consentText: String!
+    ): Result!
+    revokeSignedConsent(
       signingAddress: String!,
       signature: String!,
       consentText: String!
