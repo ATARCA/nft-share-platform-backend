@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { StoredPendingMetadata, StoredPendingMetadataModel } from './models/StoredPendingMetadataModel';
-import { getConsentMessageToSign, addSignedConsent as handleAddSignedConsent, consentNeeded as handleConsentNeeded } from './services/consentService';
+import { getConsentMessageToSign, handleAddSignedConsent, consentNeeded as handleConsentNeeded, getRevokeConsentMessageToSign, revokeSignedConsent } from './services/consentService';
 import { multiply } from './services/demoService';
-import { addPendingMetadataFromClient, getMetadataUploadMessageToSign, verifyMetadataSignature } from './services/metadataService';
-import { MultiplyPayloadDemo, Result } from './types';
+import { addPendingMetadataFromClient, getMetadataUploadMessageToSign } from './services/metadataService';
+import { MultiplyPayloadDemo } from './types';
 
 export const resolvers = {
     Query: {
@@ -34,6 +33,10 @@ export const resolvers = {
         getConsentMessageToSign(_root: any, _args: any) {
             const text = getConsentMessageToSign();
             return text;
+        },
+        getRevokeConsentMessageToSign(_root: any, _args: any) {
+            const text = getRevokeConsentMessageToSign();
+            return text;
         }
     },
     Mutation: {
@@ -44,6 +47,8 @@ export const resolvers = {
             const signature = args.signature as string;
 
             const result = await addPendingMetadataFromClient(pendingTxHash, metadata, signingAddress, signature);
+            console.log(`addPendingMetadata: pendingTxHash ${pendingTxHash} result ${result.success} ${result.message} metadata ${metadata} signingAddress ${signingAddress} signature ${signature}`);
+
             return result;
         },
         async addSignedConsent(_root: any, args: any) {
@@ -52,6 +57,14 @@ export const resolvers = {
             const consentText = args.consentText as string;
 
             const result = await handleAddSignedConsent(signingAddress, signature, consentText);
+            return result;
+        },
+        async revokeSignedConsent(_root: any, args: any) {
+            const signingAddress = args.signingAddress as string;
+            const signature = args.signature as string;
+            const consentText = args.consentText as string;
+
+            const result = await revokeSignedConsent(signingAddress, signature, consentText);
             return result;
         }
     }
