@@ -2,23 +2,12 @@ import { gql } from 'apollo-server';
 import { TypeSource } from '@graphql-tools/utils';
 
 export const schemaDefs: TypeSource = gql`
-  type Book {
-    title: String!
-    author: String!
-  }
-
-  type MultiplyResult {
-    value: Int!
-  }
-
   type Result {
     success: Boolean!,
     message: String
   }
 
   type Query {
-    allBooks: [Book!]!
-    multiply(value1: Int!, value2: Int!): MultiplyResult!
     getMetadataUploadMessageToSign(txHash: String!, metadata: String!): String!
     getConsentMessageToSign: String!
     getRevokeConsentMessageToSign: String!
