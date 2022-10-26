@@ -1,20 +1,19 @@
 import { ethers } from 'ethers';
 import { CHAINS, DESIRED_CHAIN_ID } from './chains';
 
-const getProviderUrl = () => {
-    const url = CHAINS[DESIRED_CHAIN_ID].urls[0] || '';
+const getProviderChainName = () => {
     const chainName = CHAINS[DESIRED_CHAIN_ID].name;
 
-    if (!url) throw new Error('web3 json rpc url not defined');
+    if (!chainName) throw new Error('web3 json rpc chainName not defined');
 
     console.log('connecting to chain ', chainName);
-    console.log('chain url ', url);
-
-    return url;
+    return chainName;
 };
 
-export let web3provider = new ethers.providers.WebSocketProvider(getProviderUrl());
+if (!process.env.INFURA_DEV_KEY) throw new Error('INFURA_DEV_KEY variable not defined');
+
+export let web3provider = new ethers.providers.InfuraProvider(getProviderChainName(), process.env.INFURA_DEV_KEY);
 
 export const initWeb3Provider = () => {
-    web3provider = new ethers.providers.WebSocketProvider(getProviderUrl());
+    web3provider = new ethers.providers.InfuraProvider(getProviderChainName(), process.env.INFURA_DEV_KEY);
 };

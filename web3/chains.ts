@@ -23,7 +23,7 @@ export const CHAINS: { [chainId: number]: BasicChainInformation } = {
     },
     5: {
         urls: [process.env.INFURA_DEV_KEY ? `wss://goerli.infura.io/ws/v3/${process.env.INFURA_DEV_KEY}` : undefined],
-        name: 'Görli',
+        name: 'goerli',
     },
     42: {
         urls: [process.env.INFURA_DEV_KEY ? `wss://kovan.infura.io/ws/v3/${process.env.INFURA_DEV_KEY}` : undefined],
@@ -65,11 +65,11 @@ export const CHAINS: { [chainId: number]: BasicChainInformation } = {
             process.env.INFURA_DEV_KEY ? `https://polygon-mainnet.infura.io/ws/v3/${process.env.INFURA_DEV_KEY}` : undefined,
             'https://polygon-rpc.com',
         ],
-        name: 'Polygon Mainnet',
+        name: 'matic',
     },
     80001: {
         urls: [process.env.INFURA_DEV_KEY ? `https://polygon-mumbai.infura.io/ws/v3/${process.env.INFURA_DEV_KEY}` : undefined],
-        name: 'Polygon Mumbai',
+        name: 'maticmum',
     },
     100: {
         urls: ['https://rpc.gnosischain.com'],

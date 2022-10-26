@@ -50,13 +50,18 @@ export const checkLatestEventsAndPostMetadata = async () => {
     }
 
     checkEventsInProgress = true;
-    const deployedContractDocuments = await DeployedTokenContractModel.find({});
 
-    const contractWorkPromises = deployedContractDocuments.map(async contractDocument => {
-        await checkEventsForContract(contractDocument);
-    });
+    try {
+        const deployedContractDocuments = await DeployedTokenContractModel.find({});
 
-    await Promise.all(contractWorkPromises);
+        const contractWorkPromises = deployedContractDocuments.map(async contractDocument => {
+            await checkEventsForContract(contractDocument);
+        });
+        await Promise.all(contractWorkPromises);
+    } catch (error) {
+        console.error('error when checking latest contract events', error);
+    }
+
     checkEventsInProgress = false;
 };
 
