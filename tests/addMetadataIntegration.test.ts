@@ -33,7 +33,6 @@ describe('add metadata integration', () => {
     afterAll(async () => {
         await testServer.stop();
         await shutdownMongoose();
-        await web3provider.destroy();
     });
 
     it('can save metadata with correct signature', async () => {

@@ -20,20 +20,20 @@ describe('metadata update on share event', () => {
         await StoredMetadataModel.deleteMany({});
 
         await DeployedTokenContractModel.deleteMany({});
-        await new DeployedTokenContractModel({ address: '0x4381dbc9b27b035f87a04995400879cd6e977aed' } ).save();
+        await new DeployedTokenContractModel({ address: '0x3f537f5e581e11c89c0e023bc430a626c2227961', lastCheckedBlockNumber: '7843117' } ).save(); //Streamr demo project
+        await new DeployedTokenContractModel({ address: '0xc2a2f67444ea2600f5dc671935bc647f9910098d', lastCheckedBlockNumber: '7843117' } ).save(); //Connecta demo project
     });
 
     afterAll(async () => {
         await DeployedTokenContractModel.deleteMany({});
-        await web3provider.destroy();
         await shutdownMongoose();
     });
 
     it('moves pending metadata to permanent metadata on event', async () => {
         await new StoredPendingMetadataModel({
             metadata: 'this is metadata',
-            mintingAddress: '0xbaf811debb67bf5fe7241f383192b97261f8e008',
-            pendingTxHash: '0x7f63615070dedb683c3e8b1b7b8a16757e333ba2769779fdba3f3c9f7be66722' }).save();
+            mintingAddress: '0xA86cb4378Cdbc327eF950789c81BcBcc3aa73D21',
+            pendingTxHash: '0x64a905d2d5957ca293ee9b268568e19fc52a64830771a1ed561bda30f348dfed' }).save();
 
         await checkLatestEventsAndPostMetadata();
 
@@ -43,8 +43,8 @@ describe('metadata update on share event', () => {
         expect(allStoredMetada[0]).toMatchObject({
             metadata: 'this is metadata',
             tokenId: '15',
-            contractAddress: '0x4381dBc9b27B035f87a04995400879Cd6e977AED'.toLowerCase(),
-            originalTokenHolder: '0x074f64B76fD5C83A9e0590c09BCd7D2B6FE3c1fD'.toLowerCase()
+            contractAddress: '0x3f537f5e581e11c89c0e023bc430a626c2227961'.toLowerCase(),
+            originalTokenHolder: '0xBAf811debB67BF5fe7241f383192B97261F8e008'.toLowerCase()
         });
     });
 

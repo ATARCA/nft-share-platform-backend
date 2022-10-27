@@ -49,7 +49,6 @@ describe('consent service', () => {
     afterAll(async () => {
         await testServer.stop();
         await shutdownMongoose();
-        await web3provider.destroy();
     });
 
     it('returns set consent text', async () => {

@@ -20,7 +20,6 @@ describe('metadata router', () => {
     });
 
     afterAll(async () => {
-        await web3provider.destroy();
         await shutdownMongoose();
     });
 

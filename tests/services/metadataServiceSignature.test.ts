@@ -6,7 +6,6 @@ import { web3provider } from '../../web3/web3provider';
 describe('metadataService signature test', () => {
 
     afterAll( async () => {
-        await web3provider.destroy();
         await shutdownMongoose();
     });
 
