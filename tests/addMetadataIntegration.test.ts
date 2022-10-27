@@ -4,7 +4,6 @@ import { schemaDefs } from '../schema';
 import { resolvers } from '../resolvers';
 import { StoredPendingMetadataModel } from '../models/StoredPendingMetadataModel';
 import { initMongoose, shutdownMongoose } from '../app';
-import { web3provider } from '../web3/web3provider';
 
 describe('add metadata integration', () => {
 
@@ -33,7 +32,6 @@ describe('add metadata integration', () => {
     afterAll(async () => {
         await testServer.stop();
         await shutdownMongoose();
-        await web3provider.destroy();
     });
 
     it('can save metadata with correct signature', async () => {

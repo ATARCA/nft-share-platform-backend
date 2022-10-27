@@ -1,6 +1,5 @@
 import { initMongoose, shutdownMongoose } from '../../app';
 import { StoredMetadataModel } from '../../models/StoredMetadataModel';
-import { web3provider } from '../../web3/web3provider';
 
 describe('StoredMetadataModel test', () => {
 
@@ -9,7 +8,6 @@ describe('StoredMetadataModel test', () => {
     });
 
     afterAll(async () => {
-        await web3provider.destroy();
         await shutdownMongoose();
     });
 

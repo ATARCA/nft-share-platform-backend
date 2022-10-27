@@ -2,7 +2,6 @@ import { app, initMongoose, shutdownMongoose } from '../../app';
 import supertest from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import { StoredMetadataModel } from '../../models/StoredMetadataModel';
-import { web3provider } from '../../web3/web3provider';
 import { StoredConsentModel } from '../../models/StoredConsentModel';
 
 const api = supertest(app);
@@ -20,7 +19,6 @@ describe('metadata router', () => {
     });
 
     afterAll(async () => {
-        await web3provider.destroy();
         await shutdownMongoose();
     });
 

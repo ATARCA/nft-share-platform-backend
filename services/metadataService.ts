@@ -15,6 +15,10 @@ import { web3provider } from '../web3/web3provider';
 const MAX_BLOCKS_IN_ONE_QUERY = 2000;
 const CHECK_OLD_BLOCKS_OFFSET = 1000; //do not check only latest blocks, in case the metadata was uploaded late (after minting tx was mined)
 
+const thisIsNotAJestTest = () => {
+    return process.env.JEST_WORKER_ID === undefined;
+};
+
 export const getMetadataUploadMessageToSign = (txHash: string, metadata: string): string => {
     return `Sign metadata to be uploaded \n txHash ${txHash} \n metadata ${metadata}`;
 };
@@ -30,7 +34,7 @@ const addMissingContractsFromSubgraph = async () => {
     const addMissingContractsPromises = result.data.projects.map ( async project => {
         const contractAddress = project.shareableContractAddress as string;
         const foundContracts = await DeployedTokenContractModel.find({ address: contractAddress });
-        if (foundContracts.length === 0) {
+        if (foundContracts.length === 0 && thisIsNotAJestTest()) {
             console.log('Adding new share contract at ', contractAddress);
             await new DeployedTokenContractModel({ address: contractAddress }).save();
         }
@@ -50,13 +54,18 @@ export const checkLatestEventsAndPostMetadata = async () => {
     }
 
     checkEventsInProgress = true;
-    const deployedContractDocuments = await DeployedTokenContractModel.find({});
 
-    const contractWorkPromises = deployedContractDocuments.map(async contractDocument => {
-        await checkEventsForContract(contractDocument);
-    });
+    try {
+        const deployedContractDocuments = await DeployedTokenContractModel.find({});
 
-    await Promise.all(contractWorkPromises);
+        const contractWorkPromises = deployedContractDocuments.map(async contractDocument => {
+            await checkEventsForContract(contractDocument);
+        });
+        await Promise.all(contractWorkPromises);
+    } catch (error) {
+        console.error('error when checking latest contract events', error);
+    }
+
     checkEventsInProgress = false;
 };
 

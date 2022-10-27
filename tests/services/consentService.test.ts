@@ -5,7 +5,6 @@ import { schemaDefs } from '../../schema';
 import { resolvers } from '../../resolvers';
 import { StoredPendingMetadataModel } from '../../models/StoredPendingMetadataModel';
 import { initMongoose, shutdownMongoose } from '../../app';
-import { web3provider } from '../../web3/web3provider';
 import { StoredConsentModel } from '../../models/StoredConsentModel';
 
 describe('consent service', () => {
@@ -49,7 +48,6 @@ describe('consent service', () => {
     afterAll(async () => {
         await testServer.stop();
         await shutdownMongoose();
-        await web3provider.destroy();
     });
 
     it('returns set consent text', async () => {
