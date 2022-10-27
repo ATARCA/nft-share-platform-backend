@@ -4,7 +4,7 @@ import { DeployedTokenContractModel } from '../../models/DeployedTokenContractMo
 import { StoredMetadataModel } from '../../models/StoredMetadataModel';
 import { StoredPendingMetadataModel } from '../../models/StoredPendingMetadataModel';
 import { checkLatestEventsAndPostMetadata } from '../../services/metadataService';
-import { initWeb3Provider, web3provider } from '../../web3/web3provider';
+import { initWeb3Provider } from '../../web3/web3provider';
 
 describe('metadata update on share event', () => {
 
