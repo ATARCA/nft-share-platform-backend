@@ -13,6 +13,7 @@ export interface ProjectDetailsQuery_projects {
   operators: any[];
   shareableContractAddress: any | null;
   likeContractAddress: any | null;
+  endorseContractAddress: any | null;
 }
 
 export interface ProjectDetailsQuery {

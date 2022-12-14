@@ -7,5 +7,6 @@ query ProjectDetailsQuery {
     operators
     shareableContractAddress
     likeContractAddress
+    endorseContractAddress
   }
 }`;
