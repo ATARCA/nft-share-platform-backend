@@ -1,6 +1,6 @@
 import 'jest';
 import { initMongoose, shutdownMongoose } from '../../app';
-import { DeployedTokenContractModel } from '../../models/DeployedTokenContractModel';
+import { DeployedEndorseTokenContractModel, DeployedShareableTokenContractModel } from '../../models/DeployedTokenContractModel';
 import { StoredMetadataModel } from '../../models/StoredMetadataModel';
 import { StoredPendingMetadataModel } from '../../models/StoredPendingMetadataModel';
 import { checkLatestEventsAndPostMetadata } from '../../services/metadataService';
@@ -19,13 +19,16 @@ describe('metadata update on share event', () => {
         await StoredPendingMetadataModel.deleteMany({});
         await StoredMetadataModel.deleteMany({});
 
-        await DeployedTokenContractModel.deleteMany({});
-        await new DeployedTokenContractModel({ address: '0x3f537f5e581e11c89c0e023bc430a626c2227961', lastCheckedBlockNumber: '7843117' } ).save(); //Streamr demo project
-        await new DeployedTokenContractModel({ address: '0xc2a2f67444ea2600f5dc671935bc647f9910098d', lastCheckedBlockNumber: '7843117' } ).save(); //Connecta demo project
+        await DeployedShareableTokenContractModel.deleteMany({});
+        await new DeployedShareableTokenContractModel({ address: '0x3f537f5e581e11c89c0e023bc430a626c2227961', lastCheckedBlockNumber: '7843117' } ).save(); //Streamr demo project
+        await new DeployedShareableTokenContractModel({ address: '0xc2a2f67444ea2600f5dc671935bc647f9910098d', lastCheckedBlockNumber: '7843117' } ).save(); //Connecta demo project
+
+        await DeployedEndorseTokenContractModel.deleteMany({});
+        await new DeployedEndorseTokenContractModel({ address: '0xf8c45bee6284c1f1c3a6738c1c9128ad73368649', lastCheckedBlockNumber: '8127213' } ).save(); //Streamr demo project
     });
 
     afterAll(async () => {
-        await DeployedTokenContractModel.deleteMany({});
+        await DeployedShareableTokenContractModel.deleteMany({});
         await shutdownMongoose();
     });
 

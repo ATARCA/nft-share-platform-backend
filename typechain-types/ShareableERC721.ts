@@ -26,6 +26,7 @@ export interface ShareableERC721Interface extends utils.Interface {
     "addOperator(address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getIndex()": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
@@ -33,6 +34,8 @@ export interface ShareableERC721Interface extends utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "initialize(string,string,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "isDerivedFrom(uint256)": FunctionFragment;
+    "isOriginalToken(uint256)": FunctionFragment;
     "mint(address,string)": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -66,6 +69,7 @@ export interface ShareableERC721Interface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
@@ -90,6 +94,14 @@ export interface ShareableERC721Interface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isDerivedFrom",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isOriginalToken",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -159,6 +171,7 @@ export interface ShareableERC721Interface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -173,6 +186,14 @@ export interface ShareableERC721Interface extends utils.Interface {
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isDerivedFrom",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isOriginalToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
@@ -355,6 +376,11 @@ export interface ShareableERC721 extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -386,6 +412,16 @@ export interface ShareableERC721 extends BaseContract {
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    isDerivedFrom(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    isOriginalToken(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -503,6 +539,11 @@ export interface ShareableERC721 extends BaseContract {
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+  burn(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   getApproved(
     tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -534,6 +575,16 @@ export interface ShareableERC721 extends BaseContract {
   isApprovedForAll(
     owner: string,
     operator: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  isDerivedFrom(
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  isOriginalToken(
+    tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -639,6 +690,8 @@ export interface ShareableERC721 extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -670,6 +723,16 @@ export interface ShareableERC721 extends BaseContract {
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    isDerivedFrom(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isOriginalToken(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -870,6 +933,11 @@ export interface ShareableERC721 extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -904,6 +972,16 @@ export interface ShareableERC721 extends BaseContract {
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isDerivedFrom(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isOriginalToken(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1027,6 +1105,11 @@ export interface ShareableERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1061,6 +1144,16 @@ export interface ShareableERC721 extends BaseContract {
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isDerivedFrom(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isOriginalToken(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

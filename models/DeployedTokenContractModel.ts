@@ -25,4 +25,5 @@ DeployedTokenContractSchema.set('toJSON', {
     }
 });
 
-export const DeployedTokenContractModel = mongoose.model<DeployedTokenContractDocument>('DeployedTokenContract', DeployedTokenContractSchema);
+export const DeployedShareableTokenContractModel = mongoose.model<DeployedTokenContractDocument>('DeployedTokenContract', DeployedTokenContractSchema);
+export const DeployedEndorseTokenContractModel = mongoose.model<DeployedTokenContractDocument>('DeployedEndorseTokenContract', DeployedTokenContractSchema);
