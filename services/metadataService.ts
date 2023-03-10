@@ -30,8 +30,10 @@ export const verifyMetadataSignature = (txHash: string, metadata: string, signin
 
 const addMissingContractsFromSubgraph = async () => {
     const result = await theGraphApolloClient.query<ProjectDetailsQuery, undefined>({ query: GET_ALL_PROJECTS });
+    console.log('Checking contracts: addMissingContractsPromises size:'+result.data.projects.length);
 
     const addMissingContractsPromises = result.data.projects.map ( async project => {
+        console.log(project.id+'Checking contracts: addMissingContractsPromises');
         await addMissingShareableContractsFromSubgraph(project);
         await addMissingEndorseContractsFromSubgraph(project);
     });
@@ -43,7 +45,7 @@ const addMissingShareableContractsFromSubgraph = async (project: ProjectDetailsQ
     const shareableContractAddress = project.shareableContractAddress as string;
     const foundContracts = await DeployedShareableTokenContractModel.find({ address: shareableContractAddress });
     if (foundContracts.length === 0 && thisIsNotAJestTest()) {
-        console.log('Adding new share contract at ', shareableContractAddress);
+        console.log(project.id+':Adding new share contract at ', shareableContractAddress);
         await new DeployedShareableTokenContractModel({ address: shareableContractAddress }).save();
     }
 };
@@ -53,7 +55,7 @@ const addMissingEndorseContractsFromSubgraph = async (project: ProjectDetailsQue
         const endorseContractAddress = project.endorseContractAddress as string;
         const foundContracts = await DeployedEndorseTokenContractModel.find({ address: endorseContractAddress });
         if (foundContracts.length === 0 && thisIsNotAJestTest()) {
-            console.log('Adding new endorse contract at ', endorseContractAddress);
+            console.log(project.id+':Adding new endorse contract at ', endorseContractAddress);
             await new DeployedEndorseTokenContractModel({ address: endorseContractAddress }).save();
         }
     }
